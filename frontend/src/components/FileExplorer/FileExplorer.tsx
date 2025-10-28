@@ -13,10 +13,10 @@ const FileExplorer: React.FC = () => {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
-    if (fileTree?.path) {
-      setExpanded(new Set([fileTree.path]));
+    if (projectPath) {
+      setExpanded(new Set([projectPath]));
     }
-  }, [fileTree]);
+  }, [projectPath]);
 
   const openFolder = async () => {
     let folderPath: string | undefined;
@@ -72,20 +72,27 @@ const FileExplorer: React.FC = () => {
   };
 
   const renderTree = (node: FileNode): JSX.Element => {
-    const isFolder = node.type === 'folder';
-    const handleClick = isFolder ? handleToggle(node.path) : () => setCurrentFile(node.path);
+    const isFolderType = node.type === 'folder';
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (isFolderType) {
+        handleToggle(node.path)();
+      } else {
+        setCurrentFile(node.path);
+      }
+    };
 
     return (
       <React.Fragment key={node.path}>
         <ListItem
           secondaryAction={
             <>
-              {isFolder && (
-                <IconButton edge="end" size="small" onClick={() => { setSelectedPath(node.path); setIsFolder(true); }}>
+              {isFolderType && (
+                <IconButton edge="end" size="small" onClick={(e) => { e.stopPropagation(); setSelectedPath(node.path); setIsFolder(true); }}>
                   <Add />
                 </IconButton>
               )}
-              <IconButton edge="end" size="small" onClick={() => deleteItem(node.path)}>
+              <IconButton edge="end" size="small" onClick={(e) => { e.stopPropagation(); deleteItem(node.path); }}>
                 <Delete />
               </IconButton>
             </>
@@ -93,15 +100,15 @@ const FileExplorer: React.FC = () => {
         >
           <ListItemButton onClick={handleClick} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
             <ListItemIcon>
-              {isFolder ? (expanded.has(node.path) ? <ExpandMore /> : <ChevronRight />) : <ChevronRight sx={{ visibility: 'hidden' }} />}
+              {isFolderType ? (expanded.has(node.path) ? <ExpandMore /> : <ChevronRight />) : <ChevronRight sx={{ visibility: 'hidden' }} />}
             </ListItemIcon>
             <ListItemIcon>
-              {isFolder ? <Folder /> : <InsertDriveFile />}
+              {isFolderType ? <Folder /> : <InsertDriveFile />}
             </ListItemIcon>
             <ListItemText primary={node.name} />
           </ListItemButton>
         </ListItem>
-        {isFolder && (
+        {isFolderType && (
           <Collapse in={expanded.has(node.path)} timeout="auto" unmountOnExit>
             <List component="div" disablePadding sx={{ pl: 4 }}>
               {node.children?.map(renderTree)}

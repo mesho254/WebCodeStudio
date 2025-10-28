@@ -11,6 +11,17 @@ export class FilesController {
     return this.filesService.loadProject(body.path);
   }
 
+  @Post('read')
+  async readFile(@Body() body: { path: string }): Promise<{ content: string }> {
+    return this.filesService.readFile(body.path);
+  }
+
+  @Post('write')
+  async writeFile(@Body() body: { path: string; content: string }) {
+    await this.filesService.writeFile(body.path, body.content);
+    return { success: true };
+  }
+
   @Post('create')
   async createItem(@Body() body: { path: string; content?: string; isFolder: boolean }) {
     await this.filesService.createFile(body.path, body.content, body.isFolder);

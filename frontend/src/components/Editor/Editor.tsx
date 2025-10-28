@@ -7,6 +7,7 @@ import axios from 'axios';
 const CodeEditor: React.FC = () => {
   const { currentFile, openFiles, fileTree, setCurrentFile, theme, updateFileContent } = useStore();
   const editorRef = useRef<any>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
@@ -45,6 +46,40 @@ const CodeEditor: React.FC = () => {
     }
   }, [currentFile, fileTree, updateFileContent, apiUrl]);
 
+  const saveFile = async (path: string, content: string) => {
+    try {
+      await axios.post(`${apiUrl}/files/write`, { path, content });
+    } catch (err) {
+      console.error('Failed to save file:', err);
+    }
+  };
+
+  const getLanguage = (filePath: string | null): string => {
+    if (!filePath) return 'plaintext';
+    const ext = filePath.split('.').pop()?.toLowerCase() || '';
+    switch (ext) {
+      case 'js':
+      case 'jsx':
+        return 'javascript';
+      case 'ts':
+      case 'tsx':
+        return 'typescript';
+      case 'json':
+        return 'json';
+      case 'md':
+        return 'markdown';
+      case 'html':
+        return 'html';
+      case 'css':
+        return 'css';
+      case 'env':
+      case 'gitignore':
+        return 'plaintext';
+      default:
+        return 'plaintext';
+    }
+  };
+
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Tabs
@@ -59,9 +94,19 @@ const CodeEditor: React.FC = () => {
       <Box sx={{ flex: 1, height: '100%' }}>
         <Editor
           height="100%"
-          defaultLanguage="javascript"
+          language={getLanguage(currentFile)}
           value={currentFile ? findContent(currentFile) : ''}
-          onChange={(value) => currentFile && updateFileContent(currentFile, value || '')}
+          onChange={(value) => {
+            if (currentFile) {
+              updateFileContent(currentFile, value || '');
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+              }
+              timeoutRef.current = setTimeout(() => {
+                saveFile(currentFile, value || '');
+              }, 1000);
+            }
+          }}
           onMount={(editor) => (editorRef.current = editor)}
           options={{
             minimap: { enabled: true },

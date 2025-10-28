@@ -41,4 +41,12 @@ export class TerminalGateway implements OnGatewayConnection, OnGatewayDisconnect
       ptyProcess.write(data);
     }
   }
+
+  @SubscribeMessage('set_cwd')
+  handleSetCwd(@MessageBody() body: { path: string }, client: Socket) {
+    const ptyProcess = this.ptys.get(client.id);
+    if (ptyProcess && body.path) {
+      ptyProcess.write(`cd ${body.path}\r`);
+    }
+  }
 }

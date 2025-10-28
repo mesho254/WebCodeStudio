@@ -53,6 +53,15 @@ export class FilesService {
     return { tree };
   }
 
+  async readFile(filePath: string): Promise<{ content: string }> {
+    const content = await fs.readFile(filePath, 'utf-8');
+    return { content };
+  }
+
+  async writeFile(filePath: string, content: string) {
+    await fs.writeFile(filePath, content);
+  }
+
   async createFile(filePath: string, content: string = '', isFolder: boolean = false) {
     if (isFolder) {
       await fs.mkdir(filePath, { recursive: true });

@@ -8,13 +8,31 @@ import io, { Socket } from 'socket.io-client';
 import useStore from '../../store';
 import { Box } from '@mui/material';
 
-const Term: React.FC = () => {
-  const { projectPath } = useStore();
+const Terminal: React.FC = () => {
+  const { projectPath, theme } = useStore();
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const getTheme = () => {
+    return theme === 'dark'
+      ? {
+          background: '#1e1e1e',
+          foreground: '#d4d4d4',
+          cursor: '#d4d4d4',
+          cursorAccent: '#1e1e1e',
+          selectionBackground: 'rgba(255, 255, 255, 0.3)',
+        }
+      : {
+          background: '#ffffff',
+          foreground: '#000000',
+          cursor: '#000000',
+          cursorAccent: '#ffffff',
+          selectionBackground: 'rgba(0, 0, 0, 0.3)',
+        };
+  };
 
   const initTerminal = useCallback(() => {
     if (!terminalRef.current) return;
@@ -24,13 +42,7 @@ const Term: React.FC = () => {
       cols: 80,
       fontSize: 14,
       fontFamily: 'Consolas, "Courier New", monospace',
-      theme: {
-        background: '#1e1e1e',
-        foreground: '#d4d4d4',
-        cursor: '#d4d4d4',
-        cursorAccent: '#1e1e1e',
-        selection: 'rgba(255, 255, 255, 0.3)',
-      },
+      theme: getTheme(),
       cursorBlink: true,
       allowTransparency: true,
       allowProposedApi: true,
@@ -65,9 +77,6 @@ const Term: React.FC = () => {
     // Handle socket connection events
     socketRef.current.on('connect', () => {
       xtermRef.current?.writeln('\x1B[1;32mConnected to terminal server\x1B[0m');
-      if (projectPath) {
-        socketRef.current?.emit('terminal_input', `cd "${projectPath}"\r`);
-      }
     });
 
     socketRef.current.on('disconnect', () => {
@@ -85,7 +94,7 @@ const Term: React.FC = () => {
       socketRef.current?.disconnect();
       xtermRef.current?.dispose();
     };
-  }, [apiUrl, projectPath]);
+  }, [apiUrl]);
 
   useEffect(() => {
     const cleanup = initTerminal();
@@ -94,12 +103,24 @@ const Term: React.FC = () => {
     };
   }, [initTerminal]);
 
+  useEffect(() => {
+    if (socketRef.current && projectPath) {
+      socketRef.current.emit('terminal_input', `cd "${projectPath}"\r`);
+    }
+  }, [projectPath]);
+
+  useEffect(() => {
+    if (xtermRef.current) {
+      xtermRef.current.options.theme = getTheme();
+    }
+  }, [theme]);
+
   return (
     <Box 
       sx={{ 
         height: '100%',
         width: '100%',
-        bgcolor: '#1e1e1e',
+        bgcolor: theme === 'dark' ? '#1e1e1e' : '#ffffff',
         overflow: 'hidden',
         '& .xterm': {
           height: '100%',
@@ -115,4 +136,4 @@ const Term: React.FC = () => {
   );
 };
 
-export default Term;
+export default Terminal;
