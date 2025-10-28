@@ -1,0 +1,93 @@
+#root {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.workspace-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 300px;
+  min-width: 200px;
+  max-width: 400px;
+  height: 100%;
+  overflow: auto;
+  resize: horizontal;
+  border-right: 1px solid var(--divider-color);
+}
+
+.editor-container {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.terminal-container {
+  height: 300px;
+  min-height: 100px;
+  max-height: 50vh;
+  resize: vertical;
+  overflow: hidden;
+  border-top: 1px solid var(--divider-color);
+}
+
+.toolbar {
+  height: 40px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--divider-color);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    z-index: 1000;
+    background: var(--background-color);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .terminal-container {
+    height: 200px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.6);
+}
