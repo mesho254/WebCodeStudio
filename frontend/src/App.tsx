@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, IconButton } from '@mui/material';
+import { CssBaseline, IconButton, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import FileExplorer from './components/FileExplorer/FileExplorer';
 import Editor from './components/Editor/Editor';
@@ -52,12 +52,12 @@ const App: React.FC = () => {
         </div>
         
         <div className="workspace-container" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          <div 
+          <Box 
             className={`sidebar ${sidebarOpen ? 'open' : ''}`} 
-            style={{ display: { xs: sidebarOpen ? 'block' : 'none', md: 'block' }, height: '100%', boxSizing: 'border-box' }}
+            sx={{ display: { xs: sidebarOpen ? 'block' : 'none', md: 'block' }, height: '100%', boxSizing: 'border-box' }}
           >
             <FileExplorer />
-          </div>
+          </Box>
           
           <div className="editor-container" style={{ flex: 1, height: '100%', boxSizing: 'border-box' }}>
             <Editor />

@@ -7,7 +7,7 @@ import axios from 'axios';
 const CodeEditor: React.FC = () => {
   const { currentFile, openFiles, fileTree, setCurrentFile, theme, updateFileContent } = useStore();
   const editorRef = useRef<any>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {

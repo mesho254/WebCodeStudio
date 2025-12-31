@@ -30,7 +30,13 @@ const useStore = create<Store>((set, get) => ({
   setFileTree: (tree) => set({ fileTree: tree }),
   openFiles: [],
   currentFile: null,
-  setCurrentFile: (path) => set({ currentFile: path, openFiles: [...new Set([...get().openFiles, path])] }),
+  setCurrentFile: (path) => {
+    if (path) {
+      set({ currentFile: path, openFiles: [...new Set([...get().openFiles, path])] });
+    } else {
+      set({ currentFile: path });
+    }
+  },
   updateFileContent: (path, content) => set((state) => {
     const updateTree = (node: FileNode): FileNode => {
       if (node.path === path) return { ...node, content };

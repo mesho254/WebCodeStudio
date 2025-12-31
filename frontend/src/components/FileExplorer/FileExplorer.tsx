@@ -19,7 +19,7 @@ const FileExplorer: React.FC = () => {
   }, [projectPath]);
 
   const openFolder = async () => {
-    let folderPath: string | undefined;
+    let folderPath: string | null;
     if ((window as any).electron) {
       folderPath = await (window as any).electron.openFolder();
     } else {
@@ -71,7 +71,7 @@ const FileExplorer: React.FC = () => {
     });
   };
 
-  const renderTree = (node: FileNode): JSX.Element => {
+  const renderTree = (node: FileNode): React.ReactElement => {
     const isFolderType = node.type === 'folder';
     const handleClick = (e: React.MouseEvent) => {
       e.stopPropagation();

@@ -3,13 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "dist-electron/main.js",
+  "description": "A VSCode-like code editor built with React, Electron, and NestJS",
+  "author": "Your Name or WebCode Studio Team",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "electron:dev": "electron-vite dev",
-    "electron:build": "electron-vite build",
-    "postinstall": "electron-builder install-app-deps",
+    "electron:build": "electron-vite build && electron-builder --win",
     "preview": "vite preview"
   },
   "build": {
@@ -17,10 +19,12 @@
     "productName": "WebCode Studio",
     "files": [
       "dist/**/*",
-      "node_modules/**/*",
-      "main.js"
+      "dist-electron/**/*",
+      "dist-preload/**/*",
+      "node_modules/**/*"
     ],
     "directories": {
+      "output": "release",
       "buildResources": "public"
     },
     "win": {
